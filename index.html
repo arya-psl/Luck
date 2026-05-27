@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Today’s Importance – 27th</title>
+  <!-- Stylish fonts: elegant heading + clean body -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #0a0a0a;
+      font-family: 'Inter', sans-serif;
+      color: #e0e0e0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      position: relative;
+      overflow-x: hidden;
+      scroll-behavior: smooth;
+    }
+
+    /* ----- animated floating particles background ----- */
+    #particles-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* main container with glassmorphism base */
+    .main-container {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 2.5rem;
+      backdrop-filter: blur(2px);
+      animation: fadeInUp 1.2s cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
+      opacity: 0;
+    }
+
+    /* cinematic loading overlay (hidden after load) */
+    .loading-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #030303;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+      transition: opacity 0.8s ease, visibility 0.8s ease;
+      backdrop-filter: blur(12px);
+    }
+    .loading-screen.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+    .loader-text {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.4rem;
+      letter-spacing: 3px;
+      color: #b3ffb3;
+      text-shadow: 0 0 18px #1eff1e;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    .dot-animation {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      background: #9fff9f;
+      border-radius: 50%;
+      margin-left: 4px;
+      animation: pulseDot 0.9s infinite;
+    }
+    .dot-animation:nth-child(2) { animation-delay: 0.15s; }
+    .dot-animation:nth-child(3) { animation-delay: 0.3s; }
+
+    @keyframes pulseDot {
+      0% { transform: scale(0.6); opacity: 0.4; box-shadow: 0 0 0 0 #a0ffa0; }
+      50% { transform: scale(1.4); opacity: 1; box-shadow: 0 0 20px #2eff2e; }
+      100% { transform: scale(0.6); opacity: 0.4; box-shadow: 0 0 0 0 #a0ffa0; }
+    }
+
+    /* title section with typing feel */
+    .title-block {
+      text-align: center;
+      margin-bottom: 0.5rem;
+    }
+    .main-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.8rem, 8vw, 4.5rem);
+      font-weight: 700;
+      color: #f0f0f0;
+      line-height: 1.2;
+      letter-spacing: 2px;
+      text-shadow: 0 0 25px rgba(170, 255, 170, 0.7);
+      display: inline-block;
+      border-right: 3px solid #9eff9e;
+      padding-right: 10px;
+      animation: blinkCursor 0.9s infinite;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+    @keyframes blinkCursor {
+      0%, 100% { border-color: #b3ffb3; }
+      50% { border-color: transparent; }
+    }
+
+    /* cards grid – responsive columns */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.8rem;
+      align-items: stretch;
+    }
+
+    /* glass card with glowing border & hover zoom */
+    .glass-card {
+      background: rgba(18, 18, 18, 0.55);
+      backdrop-filter: blur(18px) saturate(180%);
+      -webkit-backdrop-filter: blur(18px) saturate(180%);
+      border-radius: 2.5rem;
+      padding: 2rem 1.6rem;
+      border: 1px solid rgba(120, 255, 120, 0.15);
+      box-shadow: 0 25px 45px -10px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(80, 255, 80, 0.2);
+      transition: all 0.45s cubic-bezier(0.23, 1, 0.32, 1);
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+      position: relative;
+      animation: cardFadeSlide 0.9s ease-out forwards;
+      opacity: 0;
+      transform: translateY(30px);
+      color: #ddd;
+    }
+    .glass-card:nth-child(1) { animation-delay: 0.1s; }
+    .glass-card:nth-child(2) { animation-delay: 0.25s; }
+    .glass-card:nth-child(3) { animation-delay: 0.4s; }
+    .glass-card:nth-child(4) { animation-delay: 0.55s; }
+
+    @keyframes cardFadeSlide {
+      0% { opacity: 0; transform: translateY(35px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    /* glowing border animated effect */
+    .glass-card::before {
+      content: "";
+      position: absolute;
+      inset: -2px;
+      border-radius: 2.6rem;
+      padding: 2px;
+      background: linear-gradient(145deg, #4aff4a, #0b3b0b, #1eff1e, #0a1f0a);
+      background-size: 300% 300%;
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      animation: glowMove 4s infinite alternate;
+      z-index: -1;
+      opacity: 0.8;
+    }
+    @keyframes glowMove {
+      0% { background-position: 0% 0%; }
+      100% { background-position: 100% 100%; }
+    }
+
+    .glass-card:hover {
+      transform: scale(1.04) translateY(-6px);
+      box-shadow: 0 35px 55px -8px rgba(0, 30, 0, 0.9), 0 0 28px rgba(80, 255, 80, 0.5);
+      border-color: rgba(180, 255, 180, 0.5);
+      transition: all 0.35s ease;
+      background: rgba(22, 22, 22, 0.7);
+    }
+
+    .card-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.9rem;
+      font-weight: 600;
+      color: #d4ffd4;
+      text-shadow: 0 0 18px #2b8c2b;
+      letter-spacing: 0.5px;
+      border-left: 5px solid #7fff7f;
+      padding-left: 1rem;
+      margin-bottom: 0.3rem;
+      transition: text-shadow 0.3s;
+    }
+    .glass-card:hover .card-title {
+      text-shadow: 0 0 28px #55ff55, 0 0 8px #0f0;
+    }
+
+    .card-content {
+      font-size: 1.05rem;
+      line-height: 1.7;
+      font-weight: 350;
+      color: #cfcfcf;
+      flex: 1;
+      word-break: break-word;
+    }
+
+    /* thank you card special accent */
+    .glass-card:last-child .card-title {
+      color: #f5ffe0;
+    }
+    .glass-card:last-child .card-content {
+      font-style: italic;
+      font-weight: 400;
+      font-size: 1.25rem;
+      color: #e3ffd3;
+    }
+
+    /* smooth fade in for container */
+    @keyframes fadeInUp {
+      0% { opacity: 0; transform: translateY(30px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    /* responsive adjustments */
+    @media (max-width: 950px) {
+      .cards-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+      }
+      .main-title {
+        font-size: 2.8rem;
+        white-space: normal;
+        border-right: none;
+        animation: none;
+      }
+    }
+    @media (max-width: 550px) {
+      .cards-grid {
+        grid-template-columns: 1fr;
+      }
+      body {
+        padding: 1rem;
+      }
+      .glass-card {
+        padding: 1.8rem 1.4rem;
+      }
+    }
+
+    /* scroll behavior */
+    html {
+      scroll-behavior: smooth;
+    }
+  </style>
+</head>
+<body>
+  <!-- cinematic loading animation -->
+  <div class="loading-screen" id="loadingScreen">
+    <div class="loader-text">
+      Today’s importance
+      <span class="dot-animation"></span>
+      <span class="dot-animation"></span>
+      <span class="dot-animation"></span>
+    </div>
+  </div>
+
+  <!-- floating particles canvas -->
+  <canvas id="particles-canvas"></canvas>
+
+  <div class="main-container" id="mainContent">
+    <div class="title-block">
+      <h1 class="main-title" id="typingTitle">Today’s Importance – 27th</h1>
+    </div>
+
+    <div class="cards-grid">
+      <!-- Card 1 -->
+      <div class="glass-card">
+        <h2 class="card-title">Importance of the Day</h2>
+        <p class="card-content">
+          Today was a very happy day for me because in the evening Raja Mama called me to his room after a long time. Today I finally got to eat a proper meal after many days. I ate paneer, rice, and salad together, and it made me genuinely happy and peaceful.
+        </p>
+      </div>
+      <!-- Card 2 -->
+      <div class="glass-card">
+        <h2 class="card-title">What Happened Today</h2>
+        <p class="card-content">
+          Today I realized that many people around me are careless and lazy about their responsibilities. Some people avoid their work, delay important things, and focus more on comfort than discipline. It sometimes feels disappointing when people do not value responsibility and effort.
+        </p>
+      </div>
+      <!-- Card 3 -->
+      <div class="glass-card">
+        <h2 class="card-title">How These Things Can Improve</h2>
+        <p class="card-content">
+          People can improve by becoming more responsible, disciplined, and focused on their own growth. Instead of depending too much on others, everyone should learn to manage themselves better, stay calm, find their own path, and move forward peacefully without unnecessary negativity.
+        </p>
+      </div>
+      <!-- Card 4 -->
+      <div class="glass-card">
+        <h2 class="card-title">Thank You</h2>
+        <p class="card-content">
+          Thank you for this day.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      // ----- CINEMATIC LOADING SCREEN -----
+      const loadingScreen = document.getElementById('loadingScreen');
+      const mainContainer = document.getElementById('mainContent');
+      
+      window.addEventListener('load', () => {
+        // small delay to show the cinematic loader
+        setTimeout(() => {
+          loadingScreen.classList.add('hidden');
+          // start typing animation after loading disappears
+          startTypingAnimation();
+        }, 1500);
+      });
+
+      // fallback if load event already fired
+      if (document.readyState === 'complete') {
+        setTimeout(() => {
+          if (loadingScreen && !loadingScreen.classList.contains('hidden')) {
+            loadingScreen.classList.add('hidden');
+            startTypingAnimation();
+          }
+        }, 100);
+      }
+
+      // ----- TYPING ANIMATION FOR HEADING (subtle) -----
+      const titleElement = document.getElementById('typingTitle');
+      const fullTitleText = "Today’s Importance – 27th";
+      let typingStarted = false;
+
+      function startTypingAnimation() {
+        if (typingStarted) return;
+        typingStarted = true;
+        
+        if (!titleElement) return;
+        // clear existing text and set up typing
+        titleElement.textContent = '';
+        titleElement.style.borderRight = '3px solid #9eff9e';
+        
+        let charIndex = 0;
+        const typeSpeed = 70; // milliseconds per character
+        
+        function typeNextChar() {
+          if (charIndex < fullTitleText.length) {
+            titleElement.textContent += fullTitleText.charAt(charIndex);
+            charIndex++;
+            setTimeout(typeNextChar, typeSpeed);
+          } else {
+            // keep cursor blinking, optionally remove after some time
+            titleElement.style.borderRight = '3px solid #9eff9e';
+            // subtle: stop cursor blink after 4 seconds? keep it for aesthetic
+            setTimeout(() => {
+              titleElement.style.borderRight = '3px solid transparent';
+            }, 4000);
+          }
+        }
+        
+        typeNextChar();
+      }
+
+      // If loading screen hidden quickly (already loaded), start typing anyway
+      if (!loadingScreen || loadingScreen.classList.contains('hidden')) {
+        setTimeout(() => {
+          if (!typingStarted) startTypingAnimation();
+        }, 200);
+      }
+
+      // ----- FLOATING PARTICLES BACKGROUND (cinematic soft particles) -----
+      const canvas = document.getElementById('particles-canvas');
+      const ctx = canvas.getContext('2d');
+      
+      let width, height;
+      let particles = [];
+      
+      const PARTICLE_COUNT = 70;
+      const neonGreenPalette = ['#a5ffa5', '#7aff7a', '#4eff4e', '#b3ffb3', '#1eff1e'];
+      
+      function resizeCanvas() {
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas.width = width;
+        canvas.height = height;
+        // reinitialize particles if needed (optional)
+        initParticles();
+      }
+      
+      function initParticles() {
+        particles = [];
+        for (let i = 0; i < PARTICLE_COUNT; i++) {
+          particles.push({
+            x: Math.random() * width,
+            y: Math.random() * height,
+            radius: Math.random() * 2.2 + 0.8,
+            color: neonGreenPalette[Math.floor(Math.random() * neonGreenPalette.length)],
+            speedX: (Math.random() - 0.5) * 0.35,
+            speedY: (Math.random() - 0.5) * 0.35,
+            opacity: Math.random() * 0.6 + 0.25,
+          });
+        }
+      }
+      
+      function drawParticles() {
+        if (!ctx || !canvas) return;
+        ctx.clearRect(0, 0, width, height);
+        
+        for (let p of particles) {
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+          ctx.fillStyle = p.color;
+          ctx.shadowColor = '#6fff6f';
+          ctx.shadowBlur = 10;
+          ctx.globalAlpha = p.opacity;
+          ctx.fill();
+          
+          // move particle
+          p.x += p.speedX;
+          p.y += p.speedY;
+          
+          // wrap around edges
+          if (p.x < -10) p.x = width + 10;
+          if (p.x > width + 10) p.x = -10;
+          if (p.y < -10) p.y = height + 10;
+          if (p.y > height + 10) p.y = -10;
+        }
+        
+        ctx.globalAlpha = 1;
+        ctx.shadowBlur = 0;
+        ctx.shadowColor = 'transparent';
+        
+        requestAnimationFrame(drawParticles);
+      }
+      
+      window.addEventListener('resize', () => {
+        resizeCanvas();
+      });
+      
+      resizeCanvas();
+      drawParticles();
+      
+      // small tweak: ensure cards become visible even if animation delays overlap
+      document.querySelectorAll('.glass-card').forEach((card, idx) => {
+        card.style.animationDelay = `${0.1 + idx * 0.15}s`;
+      });
+      
+      // smooth scroll for any anchor (none needed, but setup)
+    })();
+  </script>
+</body>
+</html>
